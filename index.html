@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GambutWatch Indonesia – Pantau Titik Api Lahan Gambut</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>GambutWatch Indonesia</h1>
+<p>Pantau titik api di lahan gambut Sumatra dan Kalimantan pada peta satelit. Zoom sampai terlihat jalan dan desa, klik titik di peta untuk jarak ke titik api terdekat, lalu laporkan kejadian di sekitarmu. Tanpa login.</p>
+</header>
+<div class="demo" id="demo">Data di halaman ini adalah <b>contoh simulasi</b> untuk 9 wilayah gambut di Sumatra dan Kalimantan. Klik <b>Aktifkan data langsung</b> untuk menarik titik api NASA FIRMS dan cuaca Open-Meteo.</div>
+
+<div class="live"><span class="dot" id="ldot"></span><b id="lstat">Mode simulasi</b><span class="msg" id="lsub" style="margin:0"></span>
+<button class="btn" id="lbtn" type="button">Aktifkan data langsung</button>
+<label>Segarkan tiap <select id="lint"><option value="5">5 mnt</option><option value="15" selected>15 mnt</option><option value="60">60 mnt</option></select></label>
+<details><summary>Opsional: MAP_KEY NASA FIRMS</summary><input type="text" id="fkey" placeholder="MAP_KEY (gratis dari firms.modaps.eosdis.nasa.gov/api/area)" autocomplete="off"><p class="msg">Dengan MAP_KEY, titik api diambil lewat API resmi FIRMS (maks. 5 hari). Kunci hanya disimpan di browser ini.</p></details></div>
+
+<div class="stats">
+<div class="stat hot"><b id="sHot">0</b><span id="lHot">titik api</span></div>
+<div class="stat"><b id="sHigh">0</b><span id="lHigh">wilayah berisiko tinggi</span></div>
+<div class="stat"><b id="sRep">0</b><span>laporan warga</span></div>
+</div>
+
+<div class="grid">
+<section class="panel" aria-label="Peta">
+<div class="crumb" id="crumb"></div>
+<div class="tools">
+<label>Periode
+<select id="days"><option value="1">24 jam</option><option value="3">3 hari</option><option value="7" selected>7 hari</option><option value="30">30 hari</option></select></label>
+<label><input type="checkbox" id="lPeat" checked> Area gambut</label>
+<label><input type="checkbox" id="lFire" checked> Titik api</label>
+<label><input type="checkbox" id="lRep" checked> Laporan warga</label>
+<label><input type="checkbox" id="lRoad" checked> Jalan &amp; nama desa</label>
+</div>
+<div class="mapbox"><div id="map" role="application" aria-label="Peta satelit Sumatra dan Kalimantan"></div></div>
+<div class="legend">
+<span><i style="background:var(--ember)"></i>Titik api / risiko tinggi</span>
+<span><i style="background:#2f6fdb"></i>Laporan warga</span>
+<span><i style="background:var(--warn)"></i>Sedang</span>
+<span><i style="background:var(--ok)"></i>Rendah</span>
+</div>
+<div class="detail" id="detail">Pilih wilayah di peta atau di daftar.</div>
+</section>
+
+<section class="panel">
+<div class="tabs" role="tablist">
+<button role="tab" id="t1" aria-selected="true">Risiko</button>
+<button role="tab" id="t2" aria-selected="false">Lapor</button>
+<button role="tab" id="t3" aria-selected="false">Nasional</button>
+</div>
+<div id="p1"><div id="list"></div>
+<p class="formula">Skor risiko (0–100) = 35% hari tanpa hujan + 30% titik api dalam ±25 km (30 hari) + 20% porsi lahan gambut + 15% kecepatan angin.</p></div>
+
+<div id="p3" hidden></div>
+
+<div id="p2" hidden>
+<h2>Lapor kejadian</h2>
+<form id="form">
+<label for="fr">Provinsi / wilayah</label>
+<select id="fr"></select>
+<label for="fv">Kabupaten terdekat</label>
+<select id="fv"></select>
+<button type="button" class="btn alt" id="gps">Gunakan lokasi saya</button>
+<div class="msg" id="gmsg"></div>
+<label for="fk">Jenis kejadian</label>
+<select id="fk"><option>Api / asap terlihat</option><option>Pembukaan lahan baru</option><option>Kanal gambut dikeringkan</option><option>Lainnya</option></select>
+<label for="fn">Keterangan singkat</label>
+<textarea id="fn" rows="3" placeholder="Contoh: asap tebal di belakang kebun sawit"></textarea>
+<label for="ff">Foto (opsional)</label>
+<input type="file" id="ff" accept="image/*" capture="environment">
+<button class="btn" type="submit">Kirim laporan</button>
+<div class="msg" id="fmsg" role="status"></div>
+</form>
+<h2 style="margin-top:16px">Laporan terbaru</h2>
+<div id="reps"><div class="msg">Belum ada laporan.</div></div>
+</div>
+</section>
+</div>
+<footer>Sumber data sebenarnya: NASA FIRMS (titik api), BMKG/Open-Meteo (cuaca), KLHK/BRGM (peta gambut). Titik api satelit belum tentu kebakaran, sehingga laporan warga dipakai sebagai verifikasi.</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
