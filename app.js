@@ -131,6 +131,9 @@ $("form").onsubmit=e=>{
 // ===== Pemantauan langsung se-Indonesia =====
 let live=false,hasLive=false,tmr=null,upd=null,last="";
 const BB=[94.7,118.95,-5.95,6.2];
+// Kunci FIRMS bawaan agar semua pengunjung bisa memuat data langsung tanpa mengisi kunci sendiri.
+// Kunci ini gratis dan bisa diganti kapan saja di firms.modaps.eosdis.nasa.gov/api/map_key/
+const DEFAULT_KEY="f970c607861981f297243ba9e02f3eb8";
 // area asing/pulau lain di dalam kotak (semenanjung Malaysia, Borneo utara, Jawa barat, Sulawesi barat): kasar
 const XC=[[[100,7],[104.8,7],[104.8,1],[103.4,1.1],[102.3,1.9],[100.9,3],[100.2,4.2],[100,5.5]],[[109.6,2.1],[111,1.4],[113,1.3],[114.2,1.8],[115,3.9],[115.7,4.2],[117.7,4.3],[119.5,4.3],[119.5,7.6],[109,7.6]],[[105.9,-5.9],[109,-5.9],[109,-8],[105.5,-8]],[[118.3,-6],[119,-6],[119,-.5],[118.3,-.5]]];
 const pip=(x,y,p)=>{let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){const a=p[i],b=p[j];if((a[1]>y)!==(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])c=!c}return c};
@@ -145,7 +148,7 @@ function csv(t){const L=t.trim().split("\n"),h=L.shift().split(","),ix=k=>h.inde
   const tm=(at>=0?c[at]:"0000").padStart(4,"0"),ts=Date.parse(`${c[ad]}T${tm.slice(0,2)}:${tm.slice(2)}:00Z`),age=Math.max(0,Math.floor((now-ts)/864e5)),q=(c[cf]||"").trim().toLowerCase();
   o.push([x,y,isNaN(age)?0:age,q==="h"||+q>=80?"tinggi":q==="l"||(+q>0&&+q<30)?"rendah":"sedang"])}return o}
 async function getFire(){
- const d=days(),key=($("fkey").value||"").trim(),B=`${BB[0]},${BB[2]},${BB[1]},${BB[3]}`,
+ const d=days(),key=($("fkey").value||"").trim()||DEFAULT_KEY,B=`${BB[0]},${BB[2]},${BB[1]},${BB[3]}`,
  u=key?`https://firms.modaps.eosdis.nasa.gov/api/area/csv/${encodeURIComponent(key)}/VIIRS_SNPP_NRT/${B}/${Math.min(Math.max(d,1),5)}`
   :`https://firms.modaps.eosdis.nasa.gov/data/active_fire/suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_South_East_Asia_${d<=1?"24h":"7d"}.csv`;
  const r=await fetch(u,{cache:"no-store",signal:AbortSignal.timeout?AbortSignal.timeout(30000):undefined});
@@ -164,7 +167,7 @@ async function pull(){
  if(!live)return;
  if(fo){F=a.value;hasLive=true}
  if(wo)b.value.forEach((v,i)=>{const u=R.flatMap(r=>r.u)[i];u[4]=v[0];u[5]=v[1]});
- if(!fo&&!hasLive){live=false;clearInterval(tmr);F=SIMF;score();status("Gagal mengambil titik api ("+a.reason.message+"). Kemungkinan diblokir CORS atau offline: coba isi MAP_KEY atau buka halaman dari server sendiri.","err");refresh();nat();return}
+ if(!fo&&!hasLive){live=false;clearInterval(tmr);F=SIMF;score();status("Gagal mengambil titik api ("+a.reason.message+"). Periksa koneksi internet lalu coba lagi. Tampilan kembali ke data simulasi.","err");refresh();nat();return}
  if(fo||wo)upd=new Date();score();
  const t=upd?upd.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"}):"";
  status(`${t} • titik api ${fo?"✓ "+F.length:"✗ gagal (data lama)"} • cuaca ${wo?"✓":"✗ gagal"}`,fo&&wo?"":"err");
